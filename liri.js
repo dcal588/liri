@@ -6,6 +6,7 @@ var accessTokenSecret = keysINeed.twitterKeys.access_token_secret;
 
 var Twitter = require('twitter');
 var Spotify = require('node-spotify-api');
+var request = require("request");
 
 function pullTweets(tweets) {
 	var client = new Twitter({
@@ -43,6 +44,23 @@ function pullSpotify() {
 	});
 };
 
+function pullMovie() {
+	var movieName = process.argv[3];
+	var queryUrl = "http://www.omdbapi.com/?t=" + movieName + "&y=&plot=short&apikey=40e9cece";
+	request(queryUrl, function(error, response, body){
+		if(!error && response.statusCode === 200) {
+			console.log("Title: " + JSON.parse(body).Title);
+			console.log("Release Year: " + JSON.parse(body).Year);
+			console.log("IMDB Rating: " + JSON.parse(body).imdbRating);
+			console.log("Rotten Tomatoes Rating: " + JSON.parse(body).Ratings[1].Value);			
+			console.log("Produced In: " + JSON.parse(body).Country);
+			console.log("Language: " + JSON.parse(body).Language);
+			console.log("Plot: " + JSON.parse(body).Plot);
+			console.log("Actors: " + JSON.parse(body).Actors);
+		}
+	});
+};
+
 if (process.argv[2]==="my-tweets") {
 	pullTweets();
 }
@@ -50,7 +68,7 @@ if (process.argv[2]==="spotify-this-song") {
 	pullSpotify();
 }
 if (process.argv[2]==="movie-this") {
-	pullTweets();
+	pullMovie();
 }
 if (process.argv[2]==="do-what-it-says") {
 	pullTweets();
