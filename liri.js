@@ -7,8 +7,9 @@ var accessTokenSecret = keysINeed.twitterKeys.access_token_secret;
 var Twitter = require('twitter');
 var Spotify = require('node-spotify-api');
 var request = require("request");
+var fs = require("fs");
 
-function pullTweets(tweets) {
+function pullTweets(tweets, argument) {
 	var client = new Twitter({
   	consumer_key: consumerKey,
   	consumer_secret: consumerSecret,
@@ -25,12 +26,17 @@ function pullTweets(tweets) {
     }
 	});
 }
-function pullSpotify() {
+function pullSpotify(argument) {
 	var spotify = new Spotify({
   	id: "e2b61f19a9754d838b39511d43fc5827",
   	secret: "9c2fe91146254004b405ec9f5d3f3efd"
 	});
- 	var search = process.argv[3];
+	if (argument==="") {
+ 		var search = process.argv[3];
+ 	}
+ 	else {
+ 		var search = argument;
+ 	}
 	spotify.search({ type: 'track', query: search }, function(err, data) {
   	if (err) {
     	return console.log('Error occurred: ' + err);
@@ -44,8 +50,13 @@ function pullSpotify() {
 	});
 };
 
-function pullMovie() {
-	var movieName = process.argv[3];
+function pullMovie(argument) {
+	if (argument==="") {
+ 		var movieName = process.argv[3];
+ 	}
+ 	else {
+ 		var movieName = argument;
+ 	}
 	var queryUrl = "http://www.omdbapi.com/?t=" + movieName + "&y=&plot=short&apikey=40e9cece";
 	request(queryUrl, function(error, response, body){
 		if(!error && response.statusCode === 200) {
@@ -61,6 +72,29 @@ function pullMovie() {
 	});
 };
 
+function pullCommand(argument) {
+	fs.readFile("random.txt", "utf8", function(error, data) {
+		if (error) {
+  	  return console.log(error);
+  	}
+  	var request = data.split(",");
+  	var command = request[0];
+  	var argument = request[1];
+  	if (command==="my-tweets") {
+			pullTweets(argument);
+		}
+		if (command==="spotify-this-song") {
+			pullSpotify(argument);
+		}
+		if (command==="movie-this") {
+			pullMovie(argument);
+		}
+		if (command==="do-what-it-says") {
+			pullCommand(argument);
+		}
+	});
+};
+
 if (process.argv[2]==="my-tweets") {
 	pullTweets();
 }
@@ -71,5 +105,5 @@ if (process.argv[2]==="movie-this") {
 	pullMovie();
 }
 if (process.argv[2]==="do-what-it-says") {
-	pullTweets();
+	pullCommand();
 }
