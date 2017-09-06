@@ -9,7 +9,7 @@ var Spotify = require('node-spotify-api');
 var request = require("request");
 var fs = require("fs");
 
-function pullTweets(tweets, argument) {
+function pullTweets(tweets, argument, tweetCommand) {
 	var client = new Twitter({
   	consumer_key: consumerKey,
   	consumer_secret: consumerSecret,
@@ -26,7 +26,7 @@ function pullTweets(tweets, argument) {
     }
 	});
 }
-function pullSpotify(argument) {
+function pullSpotify(argument, spotifyCommand) {
 	var spotify = new Spotify({
   	id: "e2b61f19a9754d838b39511d43fc5827",
   	secret: "9c2fe91146254004b405ec9f5d3f3efd"
@@ -50,13 +50,14 @@ function pullSpotify(argument) {
 	});
 };
 
-function pullMovie(argument) {
+function pullMovie(argument, movieCommand) {
 	if (argument==="") {
  		var movieName = process.argv[3];
  	}
  	else {
  		var movieName = argument;
  	}
+ 	console.log("name: " + movieName);
 	var queryUrl = "http://www.omdbapi.com/?t=" + movieName + "&y=&plot=short&apikey=40e9cece";
 	request(queryUrl, function(error, response, body){
 		if(!error && response.statusCode === 200) {
@@ -96,13 +97,16 @@ function pullCommand(argument) {
 };
 
 if (process.argv[2]==="my-tweets") {
-	pullTweets();
+	tweetCommand = process.argv[3];
+	pullTweets(tweetCommand);
 }
 if (process.argv[2]==="spotify-this-song") {
-	pullSpotify();
+	spotifyCommand = process.argv[3];
+	pullSpotify(spotifyCommand);
 }
 if (process.argv[2]==="movie-this") {
-	pullMovie();
+	movieCommand = process.argv[3];
+	pullMovie(movieCommand);
 }
 if (process.argv[2]==="do-what-it-says") {
 	pullCommand();
